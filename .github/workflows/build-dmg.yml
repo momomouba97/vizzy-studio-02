@@ -1,0 +1,64 @@
+name: Build Vizzy Studio DMG (Intel)
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    # Intel (x86_64) macOS runner -> DMG that runs on your Intel Mac with macOS 11
+    runs-on: macos-15-intel
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      # ---- Whisper (open-source speech recognition) for AI lyrics ----
+      # Built from source as a single static binary and bundled inside the app.
+      # If this step fails the app still builds; AI lyrics then need:  brew install whisper-cpp
+      - name: Build whisper.cpp (AI lyrics engine)
+        continue-on-error: true
+        env:
+          MACOSX_DEPLOYMENT_TARGET: "11.0"
+        run: |
+          set -x
+          mkdir -p bin
+          git clone --depth 1 --branch v1.7.5 https://github.com/ggml-org/whisper.cpp /tmp/whisper \
+            || git clone --depth 1 https://github.com/ggml-org/whisper.cpp /tmp/whisper
+          cd /tmp/whisper
+          cmake -B build -DCMAKE_BUILD_TYPE=Release -DBUILD_SHARED_LIBS=OFF -DGGML_METAL=OFF -DGGML_BLAS=OFF \
+                -DWHISPER_BUILD_TESTS=OFF -DWHISPER_BUILD_SERVER=OFF -DCMAKE_OSX_DEPLOYMENT_TARGET=11.0
+          cmake --build build --config Release -j 4 --target whisper-cli
+          BIN=$(find build -name whisper-cli -type f | head -n 1)
+          cp "$BIN" "$GITHUB_WORKSPACE/bin/whisper-cli"
+          chmod +x "$GITHUB_WORKSPACE/bin/whisper-cli"
+          otool -L "$GITHUB_WORKSPACE/bin/whisper-cli" || true
+
+      - name: Check Whisper binary
+        run: ls -lh bin; (file bin/whisper-cli && bin/whisper-cli -h 2>&1 | head -n 5) || echo "whisper-cli not bundled"
+
+      - name: Install dependencies
+        run: npm install --no-audit --no-fund
+
+      - name: Check bundled FFmpeg
+        run: |
+          node -e "const p=require('ffmpeg-static');console.log('ffmpeg at',p)"
+          "$(node -p "require('ffmpeg-static')")" -hide_banner -encoders | grep -E "libx264|videotoolbox" || true
+
+      - name: Build DMG
+        env:
+          CSC_IDENTITY_AUTO_DISCOVERY: "false"
+        run: npm run dist
+
+      - name: List output
+        run: ls -lh dist
+
+      - name: Upload DMG
+        uses: actions/upload-artifact@v4
+        with:
+          name: Vizzy-Studio-DMG
+          path: dist/*.dmg
+          if-no-files-found: error
