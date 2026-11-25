@@ -1,0 +1,61 @@
+{
+  "name": "vizzy-studio",
+  "productName": "Vizzy Studio",
+  "version": "2.0.0",
+  "description": "Professional music visualizer and lyric video maker with offline AI lyrics (Whisper) for macOS (Intel)",
+  "main": "src/main.js",
+  "author": "Vizzy Studio",
+  "license": "MIT",
+  "scripts": {
+    "start": "electron .",
+    "dist": "electron-builder --mac dmg --x64 --publish never"
+  },
+  "dependencies": {
+    "ffmpeg-static": "^5.2.0"
+  },
+  "devDependencies": {
+    "electron": "32.3.3",
+    "electron-builder": "24.13.3"
+  },
+  "build": {
+    "appId": "com.vizzystudio.app",
+    "productName": "Vizzy Studio",
+    "asar": true,
+    "asarUnpack": [
+      "node_modules/ffmpeg-static/**"
+    ],
+    "files": [
+      "src/**/*",
+      "package.json"
+    ],
+    "mac": {
+      "category": "public.app-category.video",
+      "target": [
+        {
+          "target": "dmg",
+          "arch": [
+            "x64"
+          ]
+        }
+      ],
+      "icon": "build/icon.png",
+      "identity": null,
+      "hardenedRuntime": false,
+      "gatekeeperAssess": false,
+      "minimumSystemVersion": "10.15.0"
+    },
+    "dmg": {
+      "title": "Vizzy Studio",
+      "artifactName": "Vizzy-Studio-${version}-intel.${ext}"
+    },
+    "extraResources": [
+      {
+        "from": "bin",
+        "to": "bin",
+        "filter": [
+          "**/*"
+        ]
+      }
+    ]
+  }
+}

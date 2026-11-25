@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Vizzy Studio</title>
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; img-src 'self' blob: data:; media-src 'self' blob:; style-src 'self' 'unsafe-inline'; script-src 'self'; font-src 'self' blob: data:; connect-src 'self' blob:">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+<div id="app">
+  <header id="topbar">
+    <div class="brand"><span class="logo">▮▮▮</span> Vizzy Studio</div>
+    <input id="project-name" class="name-input" value="Untitled project" spellcheck="false" title="Project name">
+    <button id="btn-templates" class="btn" title="Browse 40+ templates">🎨 Templates</button>
+    <button id="btn-magic" class="btn" title="One-click video from a song">✨ Magic</button>
+    <button id="btn-ai" class="btn" title="Whisper AI: generate &amp; sync lyrics">🤖 AI Lyrics</button>
+    <button id="btn-analysis" class="btn" title="Tempo, key, loudness, sections">📊 Analysis</button>
+    <button id="btn-open" class="btn">Open</button>
+    <button id="btn-save" class="btn">Save</button>
+    <button id="btn-undo" class="btn icon" title="Undo (⌘Z)">↶</button>
+    <button id="btn-redo" class="btn icon" title="Redo (⇧⌘Z)">↷</button>
+    <select id="aspect" title="Video format">
+      <option value="16:9">16:9 · YouTube</option>
+      <option value="9:16">9:16 · Shorts / Reels</option>
+      <option value="1:1">1:1 · Square</option>
+      <option value="4:5">4:5 · Instagram</option>
+      <option value="4:3">4:3</option>
+      <option value="21:9">21:9 · Cinema</option>
+    </select>
+    <div class="spacer"></div>
+    <button id="btn-audio" class="btn">♫ Load audio</button>
+    <button id="btn-export" class="btn primary">Export MP4</button>
+  </header>
+
+  <aside id="left">
+    <div class="panel-title">Add layer</div>
+    <div id="add-grid"></div>
+    <div class="panel-title">Layers <span class="hint">top = in front</span></div>
+    <div id="layer-list"></div>
+  </aside>
+
+  <section id="center">
+    <div id="viewbar">
+      <label>Preview <select id="q-preview"><option value="360">360p</option><option value="540" selected>540p</option><option value="720">720p</option><option value="1080">1080p</option></select></label>
+      <label class="chk"><input type="checkbox" id="chk-guides"> Guides (G)</label>
+      <label class="chk"><input type="checkbox" id="chk-loop"> Loop</label>
+      <button id="btn-still" class="btn small">📷 Save frame (PNG)</button>
+    </div>
+    <div id="stage"><div id="pwrap"><canvas id="preview" width="960" height="540"></canvas><canvas id="overlay"></canvas></div></div>
+    <div id="transport">
+      <button id="btn-play" class="btn play">▶</button>
+      <span id="time-label" class="mono">0:00.0 / 0:00.0</span>
+      <input id="seek" type="range" min="0" max="1000" value="0">
+      <span class="vol">🔊</span><input id="volume" type="range" min="0" max="1" step="0.01" value="1">
+    </div>
+  </section>
+
+  <aside id="right">
+    <div class="panel-title" id="inspector-title">Project</div>
+    <div id="inspector"></div>
+  </aside>
+
+  <footer id="timeline">
+    <div class="tl-bar">
+      <span class="panel-title" style="padding:0;border:0">Timeline</span>
+      <label>Zoom <input id="tl-zoom" type="range" min="5" max="300" value="60"></label>
+      <button id="tl-fit" class="btn small">Fit</button>
+      <span class="hint">Click the ruler / waveform to seek · drag clips to move, drag edges to trim</span>
+    </div>
+    <div id="tl-scroll"><div id="tl-inner">
+      <canvas id="tl-wave" height="74"></canvas>
+      <div id="tl-rows"></div>
+      <div id="tl-playhead"></div>
+    </div></div>
+  </footer>
+</div>
+
+<div id="modal" class="hidden"><div class="modal-card" id="modal-card"></div></div>
+<div id="toast" class="hidden"></div>
+
+<script src="audio.js"></script>
+<script src="analysis.js"></script>
+<script src="lyricsai.js"></script>
+<script src="engine.js"></script>
+<script src="engine2.js"></script>
+<script src="templates.js"></script>
+<script src="app.js"></script>
+<script src="app2.js"></script>
+</body>
+</html>
